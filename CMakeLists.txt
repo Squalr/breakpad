@@ -24,12 +24,30 @@ add_library(breakpad_client STATIC
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/common/linux/memory_mapped_file.cc>
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/common/linux/safe_readlink.cc>
 
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/handler/breakpad_nlist_64.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/crash_generation/ConfigFile.mm>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/crash_generation/crash_generation_client.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/crash_generation/crash_generation_server.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/handler/dynamic_images.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/handler/exception_handler.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/handler/minidump_generator.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/handler/protected_memory_allocator.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/common/mac/arch_utilities.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/common/mac/bootstrap_compat.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/common/mac/file_id.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/common/mac/launch_reporter.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/common/mac/MachIPC.mm>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/common/mac/macho_id.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/common/mac/macho_utilities.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/common/mac/macho_walker.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/common/mac/string_utilities.cc>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/Framework/Breakpad.mm>
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/Framework/OnDemandServer.mm>
+
     ${CMAKE_CURRENT_LIST_DIR}/src/client/minidump_file_writer.cc
-
-    # EVIL cocos already uses the symbol so we'll use it's implementation OH MY GERD!!!
     #${CMAKE_CURRENT_LIST_DIR}/src/common/convert_UTF.c
-
     ${CMAKE_CURRENT_LIST_DIR}/src/common/md5.cc
+    ${CMAKE_CURRENT_LIST_DIR}/src/common/simple_string_dictionary.cc
     ${CMAKE_CURRENT_LIST_DIR}/src/common/string_conversion.cc
 )
 
@@ -65,6 +83,11 @@ target_compile_definitions(breakpad_client PUBLIC
     $<$<PLATFORM_ID:Linux>:HAVE_SYS_STAT_H>
     $<$<PLATFORM_ID:Linux>:HAVE_SYS_TYPES_H>
     $<$<PLATFORM_ID:Linux>:HAVE_UNISTD_H  >
+)
+
+# internal interface
+target_include_directories(breakpad_client PRIVATE
+    $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/apple/Framework>
 )
 
 # include public interface
