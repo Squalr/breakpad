@@ -23,6 +23,7 @@ add_library(breakpad_client STATIC
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/common/linux/linux_libc_support.cc>
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/common/linux/memory_mapped_file.cc>
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/common/linux/safe_readlink.cc>
+    $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/common/linux/http_upload.cc>
 
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/handler/breakpad_nlist_64.cc>
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/crash_generation/ConfigFile.mm>
@@ -93,4 +94,9 @@ target_include_directories(breakpad_client PRIVATE
 # include public interface
 target_include_directories(breakpad_client PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/src
+)
+
+# libraries
+target_link_libraries(breakpad_client PRIVATE
+    $<$<PLATFORM_ID:Linux>:dl>
 )
