@@ -45,7 +45,21 @@ add_library(breakpad_client STATIC
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/Framework/Breakpad.mm>
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/Framework/OnDemandServer.mm>
 
-    ${CMAKE_CURRENT_LIST_DIR}/src/client/minidump_file_writer.cc
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/client/windows/crash_generation/client_info.cc>
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/client/windows/crash_generation/crash_generation_client.cc>
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/client/windows/crash_generation/crash_generation_server.cc>
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/client/windows/crash_generation/minidump_generator.cc>
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/client/windows/handler/exception_handler.cc>
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/client/windows/sender/crash_report_sender.cc>
+    #$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/common/windows/dia_util.cc>
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/common/windows/guid_string.cc>
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/common/windows/http_upload.cc>
+    #$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/common/windows/omap.cc>
+    #$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/common/windows/pdb_source_line_writer.cc>
+    $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/common/windows/string_utils.cc>
+
+    $<$<NOT:$<PLATFORM_ID:Windows>>:${CMAKE_CURRENT_LIST_DIR}/src/client/minidump_file_writer.cc>
+
     #${CMAKE_CURRENT_LIST_DIR}/src/common/convert_UTF.c
     ${CMAKE_CURRENT_LIST_DIR}/src/common/md5.cc
     ${CMAKE_CURRENT_LIST_DIR}/src/common/simple_string_dictionary.cc
@@ -99,4 +113,5 @@ target_include_directories(breakpad_client PUBLIC
 # libraries
 target_link_libraries(breakpad_client PRIVATE
     $<$<PLATFORM_ID:Linux>:dl>
+    $<$<PLATFORM_ID:Windows>:wininet>
 )
