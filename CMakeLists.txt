@@ -1,9 +1,25 @@
 # CMake wrapper for Google Breakpad
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+include(CheckIncludeFile)
 project(breakpad-cmake VERSION 0.0.1)
+
+# check for various headers
+check_include_file("a.out.h" HAVE_A_OUT_H)
+check_include_file("inttypes.h" HAVE_INTTYPES_H)
+check_include_file("memory.h" HAVE_MEMORY_H)
+check_include_file("pthread.h" HAVE_PTHREAD_H)
+check_include_file("stdint.h" HAVE_STDINT_H)
+check_include_file("stdlib.h" HAVE_STDLIB_H)
+check_include_file("strings.h" HAVE_STRINGS_H)
+check_include_file("string.h" HAVE_STRING_H)
+check_include_file("sys/random.h" HAVE_SYS_RANDOM_H)
+check_include_file("sys/random.h" HAVE_SYS_STAT_H)
+check_include_file("sys/random.h" HAVE_SYS_TYPES_H)
+check_include_file("unistd.h" HAVE_UNISTD_H)
 
 # breakpad_client must be build static (shared library calls ARE BAD in exception land)
 add_library(breakpad_client STATIC
+    # linux specific sources
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/client/linux/crash_generation/crash_generation_client.cc>
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/client/linux/crash_generation/crash_generation_server.cc>
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/client/linux/dump_writer_common/thread_info.cc>
@@ -25,6 +41,7 @@ add_library(breakpad_client STATIC
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/common/linux/safe_readlink.cc>
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/common/linux/http_upload.cc>
 
+    # mac specific sources
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/handler/breakpad_nlist_64.cc>
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/crash_generation/ConfigFile.mm>
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/crash_generation/crash_generation_client.cc>
@@ -45,6 +62,7 @@ add_library(breakpad_client STATIC
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/Framework/Breakpad.mm>
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/mac/Framework/OnDemandServer.mm>
 
+    # windows specific sources
     $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/client/windows/crash_generation/client_info.cc>
     $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/client/windows/crash_generation/crash_generation_client.cc>
     $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/client/windows/crash_generation/crash_generation_server.cc>
@@ -58,6 +76,7 @@ add_library(breakpad_client STATIC
     #$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/common/windows/pdb_source_line_writer.cc>
     $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_LIST_DIR}/src/common/windows/string_utils.cc>
 
+    # non windows platforms need the minidump writer
     $<$<NOT:$<PLATFORM_ID:Windows>>:${CMAKE_CURRENT_LIST_DIR}/src/client/minidump_file_writer.cc>
 
     #${CMAKE_CURRENT_LIST_DIR}/src/common/convert_UTF.c
@@ -66,38 +85,22 @@ add_library(breakpad_client STATIC
     ${CMAKE_CURRENT_LIST_DIR}/src/common/string_conversion.cc
 )
 
-# be a good boy and actually check these at some point
-#define HAVE_A_OUT_H
-#define HAVE_CXX11
-#define HAVE_GETRANDOM
-#define HAVE_INTTYPES_H
-#define HAVE_MEMORY_H
-#define HAVE_PTHREAD
-#define HAVE_STDINT_H
-#define HAVE_STDLIB_H
-#define HAVE_STRINGS_H
-#define HAVE_STRING_H
-#define HAVE_SYS_RANDOM_H
-#define HAVE_SYS_STAT_H
-#define HAVE_SYS_TYPES_H
-#define HAVE_UNISTD_H
-
-# add definitions related to system configuration (forced for now, MUST check these eventually)
-target_compile_definitions(breakpad_client PUBLIC
-    $<$<PLATFORM_ID:Linux>:HAVE_A_OUT_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_CXX11>
-    $<$<PLATFORM_ID:Linux>:HAVE_GETRANDOM>
-    $<$<PLATFORM_ID:Linux>:HAVE_INTTYPES_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_MEMORY_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_PTHREAD>
-    $<$<PLATFORM_ID:Linux>:HAVE_STDINT_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_STDLIB_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_STRINGS_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_STRING_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_SYS_RANDOM_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_SYS_STAT_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_SYS_TYPES_H>
-    $<$<PLATFORM_ID:Linux>:HAVE_UNISTD_H  >
+# add definitions related to system configuration
+target_compile_definitions(breakpad_client PRIVATE
+    HAVE_CXX11
+    $<$<BOOL:HAVE_A_OUT_H>:HAVE_A_OUT_H>
+    $<$<BOOL:HAVE_SYS_RANDOM_H>:HAVE_GETRANDOM>
+    $<$<BOOL:HAVE_INTTYPES_H>:HAVE_INTTYPES_H>
+    $<$<BOOL:HAVE_MEMORY_H>:HAVE_MEMORY_H>
+    $<$<BOOL:HAVE_PTHREAD_H>:HAVE_PTHREAD>
+    $<$<BOOL:HAVE_STDINT_H>:HAVE_STDINT_H>
+    $<$<BOOL:HAVE_STDLIB_H>:HAVE_STDLIB_H>
+    $<$<BOOL:HAVE_STRINGS_H>:HAVE_STRINGS_H>
+    $<$<BOOL:HAVE_STRING_H>:HAVE_STRING_H>
+    $<$<BOOL:HAVE_SYS_RANDOM_H>:HAVE_SYS_RANDOM_H>
+    $<$<BOOL:HAVE_SYS_STAT_H>:HAVE_SYS_STAT_H>
+    $<$<BOOL:HAVE_SYS_TYPES_H>:HAVE_SYS_TYPES_H>
+    $<$<BOOL:HAVE_UNISTD_H>:HAVE_UNISTD_H>
 )
 
 # internal interface
@@ -110,7 +113,7 @@ target_include_directories(breakpad_client PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/src
 )
 
-# libraries
+# dependencies
 target_link_libraries(breakpad_client PRIVATE
     $<$<PLATFORM_ID:Linux>:dl>
     $<$<PLATFORM_ID:Windows>:wininet>
