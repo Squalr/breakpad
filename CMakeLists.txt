@@ -18,7 +18,7 @@ check_include_file("sys/random.h" HAVE_SYS_TYPES_H)
 check_include_file("unistd.h" HAVE_UNISTD_H)
 
 # breakpad_client must be build static (shared library calls ARE BAD in exception land)
-add_library(breakpad_client STATIC
+add_library(client STATIC
     # linux specific sources
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/client/linux/crash_generation/crash_generation_client.cc>
     $<$<PLATFORM_ID:Linux>:${CMAKE_CURRENT_LIST_DIR}/src/client/linux/crash_generation/crash_generation_server.cc>
@@ -85,8 +85,10 @@ add_library(breakpad_client STATIC
     ${CMAKE_CURRENT_LIST_DIR}/src/common/string_conversion.cc
 )
 
+add_library(breakpad::client ALIAS client)
+
 # add definitions related to system configuration
-target_compile_definitions(breakpad_client PRIVATE
+target_compile_definitions(client PRIVATE
     HAVE_CXX11
     $<$<BOOL:HAVE_A_OUT_H>:HAVE_A_OUT_H>
     $<$<BOOL:HAVE_SYS_RANDOM_H>:HAVE_GETRANDOM>
@@ -103,18 +105,23 @@ target_compile_definitions(breakpad_client PRIVATE
     $<$<BOOL:HAVE_UNISTD_H>:HAVE_UNISTD_H>
 )
 
+target_compile_definitions(client PUBLIC
+    $<$<PLATFORM_ID:Windows>:UNICODE>
+    $<$<PLATFORM_ID:Windows>:_UNICODE>
+)
+
 # internal interface
-target_include_directories(breakpad_client PRIVATE
+target_include_directories(client PRIVATE
     $<$<PLATFORM_ID:Darwin>:${CMAKE_CURRENT_LIST_DIR}/src/client/apple/Framework>
 )
 
 # include public interface
-target_include_directories(breakpad_client PUBLIC
+target_include_directories(client PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/src
 )
 
 # dependencies
-target_link_libraries(breakpad_client PRIVATE
+target_link_libraries(client PRIVATE
     $<$<PLATFORM_ID:Linux>:dl>
     $<$<PLATFORM_ID:Windows>:wininet>
 )
