@@ -40,6 +40,7 @@
 
 #include <algorithm>
 #include <string>
+#include <stdio.h>
 
 #include "common/linux/elf_gnu_compat.h"
 #include "common/linux/elfutils.h"
@@ -63,8 +64,8 @@ FileID::FileID(const char* path) : path_(path) {}
 
 static bool ElfClassBuildIDNoteIdentifier(const void *section, size_t length,
                                           wasteful_vector<uint8_t>& identifier) {
-  static_assert(sizeof(ElfClass32::Nhdr) == sizeof(ElfClass64::Nhdr),
-                "Elf32_Nhdr and Elf64_Nhdr should be the same");
+  // static_assert(sizeof(ElfClass32::Nhdr) == sizeof(ElfClass64::Nhdr),
+  //               "Elf32_Nhdr and Elf64_Nhdr should be the same");
   typedef typename ElfClass32::Nhdr Nhdr;
 
   const void* section_end = reinterpret_cast<const char*>(section) + length;
@@ -99,7 +100,9 @@ static bool FindElfBuildIDNote(const void* elf_mapped_base,
   // lld normally creates 2 PT_NOTEs, gold normally creates 1.
   auto_wasteful_vector<ElfSegment, 2> segs(&allocator);
   if (FindElfSegments(elf_mapped_base, PT_NOTE, &segs)) {
-    for (ElfSegment& seg : segs) {
+
+  for (int index = 0; index < int(segs.size()); index++) {
+    ElfSegment& seg = segs[index];
       if (ElfClassBuildIDNoteIdentifier(seg.start, seg.size, identifier)) {
         return true;
       }

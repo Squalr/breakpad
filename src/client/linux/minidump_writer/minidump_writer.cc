@@ -147,7 +147,7 @@ class MinidumpWriter {
         skip_stacks_if_mapping_unreferenced_(
             skip_stacks_if_mapping_unreferenced),
         principal_mapping_address_(principal_mapping_address),
-        principal_mapping_(nullptr),
+        principal_mapping_(NULL),
     sanitize_stacks_(sanitize_stacks) {
     // Assert there should be either a valid fd or a valid path, not both.
     assert(fd_ != -1 || minidump_path);
@@ -932,7 +932,8 @@ class MinidumpWriter {
       const char* field;
       while (reader->GetNextField(&field)) {
         bool is_first_entry = true;
-        for (CpuInfoEntry& entry : cpu_info_table) {
+        for (int index = 0; index < sizeof(cpu_info_table); index++) {
+          CpuInfoEntry& entry = cpu_info_table[index];
           if (!is_first_entry && entry.found) {
             // except for the 'processor' field, ignore repeated values.
             continue;
@@ -965,7 +966,8 @@ class MinidumpWriter {
     }
 
     // make sure we got everything we wanted
-    for (const CpuInfoEntry& entry : cpu_info_table) {
+    for (int index = 0; index < sizeof(cpu_info_table); index++) {
+      CpuInfoEntry& entry = cpu_info_table[index];
       if (!entry.found) {
         return false;
       }

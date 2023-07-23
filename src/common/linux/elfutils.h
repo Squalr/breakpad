@@ -57,7 +57,7 @@ struct ElfClass32 {
   static const int kClass = ELFCLASS32;
   static const uint16_t kMachine = EM_386;
   static const size_t kAddrSize = sizeof(Elf32_Addr);
-  static constexpr const char* kMachineName = "x86";
+  static const char* kMachineName;
 };
 
 struct ElfClass64 {
@@ -74,7 +74,7 @@ struct ElfClass64 {
   static const int kClass = ELFCLASS64;
   static const uint16_t kMachine = EM_X86_64;
   static const size_t kAddrSize = sizeof(Elf64_Addr);
-  static constexpr const char* kMachineName = "x86_64";
+  static const char* kMachineName;
 };
 
 bool IsValidElf(const void* elf_header);

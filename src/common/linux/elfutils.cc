@@ -37,6 +37,9 @@
 
 namespace google_breakpad {
 
+const char* ElfClass32::kMachineName = "x86_64";
+const char* ElfClass64::kMachineName = "x86_64";
+
 namespace {
 
 template<typename ElfClass>

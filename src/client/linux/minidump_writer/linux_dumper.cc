@@ -832,8 +832,8 @@ void LinuxDumper::SanitizeStackCopy(uint8_t* stack_copy, size_t stack_len,
   // on 32 bit architectures. On 64 bit architectures this would be
   // uninformative so we take the same range of bits.
   const unsigned int shift = 32 - 11;
-  const MappingInfo* last_hit_mapping = nullptr;
-  const MappingInfo* hit_mapping = nullptr;
+  const MappingInfo* last_hit_mapping = NULL;
+  const MappingInfo* hit_mapping = NULL;
   const MappingInfo* stack_mapping = FindMappingNoBias(stack_pointer);
   // The magnitude below which integers are considered to be to be
   // 'small', and not constitute a PII risk. These are included to
@@ -887,7 +887,7 @@ void LinuxDumper::SanitizeStackCopy(uint8_t* stack_copy, size_t stack_len,
     }
     uintptr_t test = addr >> shift;
     if (could_hit_mapping[(test >> 3) & array_mask] & (1 << (test & 7)) &&
-        (hit_mapping = FindMappingNoBias(addr)) != nullptr &&
+        (hit_mapping = FindMappingNoBias(addr)) != NULL &&
         hit_mapping->exec) {
       last_hit_mapping = hit_mapping;
       continue;

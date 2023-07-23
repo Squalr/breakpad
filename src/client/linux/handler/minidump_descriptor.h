@@ -38,6 +38,20 @@
 #include "client/linux/handler/microdump_extra_info.h"
 #include "common/using_std_string.h"
 
+#if __WORDSIZE == 64
+# ifndef __intptr_t_defined
+typedef long int		intptr_t;
+#  define __intptr_t_defined
+# endif
+typedef unsigned long int	uintptr_t;
+#else
+# ifndef __intptr_t_defined
+typedef int			intptr_t;
+#  define __intptr_t_defined
+# endif
+typedef unsigned int		uintptr_t;
+#endif
+
 // This class describes how a crash dump should be generated, either:
 // - Writing a full minidump to a file in a given directory (the actual path,
 //   inside the directory, is determined by this class).

@@ -138,7 +138,7 @@ void InstallAlternateStackLocked() {
   // SIGSTKSZ may be too small to prevent the signal handlers from overrunning
   // the alternative stack. Ensure that the size of the alternative stack is
   // large enough.
-  static const unsigned kSigStackSize = std::max((long int)16384, SIGSTKSZ);
+  static const unsigned kSigStackSize = std::max(16384, SIGSTKSZ);
 
   // Only set an alternative stack if there isn't already one, or if the current
   // one is too small.
@@ -212,7 +212,7 @@ pthread_mutex_t g_handler_stack_mutex_ = PTHREAD_MUTEX_INITIALIZER;
 // time can use |g_crash_context_|.
 ExceptionHandler::CrashContext g_crash_context_;
 
-FirstChanceHandler g_first_chance_handler_ = nullptr;
+FirstChanceHandler g_first_chance_handler_ = NULL;
 }  // namespace
 
 // Runs before crashing: normal context.
@@ -333,7 +333,7 @@ void ExceptionHandler::SignalHandler(int sig, siginfo_t* info, void* uc) {
   // safety in WebAssembly. This means some signals might be expected if they
   // originate from Wasm code while accessing the guard region. We give V8 the
   // chance to handle and recover from these signals first.
-  if (g_first_chance_handler_ != nullptr &&
+  if (g_first_chance_handler_ != NULL &&
       g_first_chance_handler_(sig, info, uc)) {
     return;
   }

@@ -43,6 +43,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#undef HAVE_SYS_RANDOM_H
+
 #if defined(HAVE_SYS_RANDOM_H)
 #include <sys/random.h>
 #endif
